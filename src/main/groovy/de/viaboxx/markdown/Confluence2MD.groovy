@@ -28,7 +28,7 @@ class Confluence2MD extends ConfluenceParser implements Walker {
     protected Table table
 
     protected def written = null
-    protected boolean footnotes = true
+    protected boolean footnotes = false
 
     int maxHeaderDepth = 5 // docx does not support more!
 
@@ -499,6 +499,7 @@ class Confluence2MD extends ConfluenceParser implements Walker {
                     }
                     return true
                 },
+                "AC:PLACEHOLDER"     : { node -> true /* skip */ }
         ]
 
         def handler = { node -> // codeblock
@@ -518,9 +519,9 @@ class Confluence2MD extends ConfluenceParser implements Walker {
                 write(node.text())
             } else {
                 withMode(CodeBlock) {
-                    writeRaw("\n\n~~~~~~~\n")
+                    writeRaw("\n\n```\n")
                     write(node.text())
-                    writeRaw("\n~~~~~~~\n")
+                    writeRaw("\n```\n")
                 }
             }
             return true
@@ -645,11 +646,11 @@ class Confluence2MD extends ConfluenceParser implements Walker {
     }
 
     protected boolean writeHeaderBeginTags(int level) {
-        return writeHeaderTags(level)
+        return writeHeaderTags(level) && writeRaw(" ")
     }
 
     protected boolean writeHeaderEndTags(int level) {
-        return writeHeaderTags(level)
+        return writeRaw(" ") && writeHeaderTags(level)
     }
 
     protected boolean writeHeaderTags(int level) {
@@ -707,7 +708,7 @@ class Confluence2MD extends ConfluenceParser implements Walker {
     void writeln() {
         boolean newLineBefore = newLine
         if (mode == Mode.Table) {
-            out.println('\\')
+            out.print('<br>')
             newLine = true
         } else {
             out.println()
@@ -747,9 +748,9 @@ class Confluence2MD extends ConfluenceParser implements Walker {
             newLine = text.endsWith(nl)
             blankLine = text.endsWith(nl + nl)
         } else if (mode == Mode.Table) {
-            text = text.replace('\n', '\\\n')
-            newLine = text.endsWith('\\\n')
-            blankLine = text.endsWith('\\\n\\\n')
+            text = text.replace('\n', '<br>')
+            newLine = text.endsWith('<br>\n')
+            blankLine = text.endsWith('<br>\n<br>\n')
         } else {
             newLine = text.endsWith('\n')
             blankLine = text.endsWith('\n\n')
@@ -759,7 +760,7 @@ class Confluence2MD extends ConfluenceParser implements Walker {
     protected static
     final String[] SEARCH = ['_', '$', '*', '\\', '<', '#', "^[", "*", "`", "{", "}", "[", "]", ">", "#", "+", "-", ".", "!"] as String[]
     protected static
-    final String[] REPLACE = ['\\_', '\\$', '\\*', '\\\\', '\\<', '\\#', "^\\[", "\\*", "\\`", "\\{", "\\}", "\\[", "\\]", "\\>", "\\#", "\\+", "\\-", "\\.", "\\!"] as String[]
+    final String[] REPLACE = ['\\_', '$', '\\*', '\\\\', '\\<', '\\#', "^\\[", "\\*", "\\`", "\\{", "\\}", "\\[", "\\]", "\\>", "\\#", "+", "-", ".", "\\!"] as String[]
 
     protected String transform(String text) {
         // escape unwanted footnotes etc.
@@ -773,7 +774,7 @@ class Confluence2MD extends ConfluenceParser implements Walker {
             blockIndent.times { buf.append("> ") }
             text = text.replace("\n", "\n " + buf.toString())
         } else if (mode == Mode.Table) {
-            text = text.replace('\n', '\\\n')
+            text = text.replace('\n', '<br>')
         }
         // \`*_{}[]()>#+-.!
         return text

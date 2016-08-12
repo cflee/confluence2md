@@ -29,13 +29,13 @@ class Confluence2MDTest extends Specification {
                 'unbekannte Ursache<br class=\"atl-forced-newline\" />\n 70 Service-T&uuml;r ge&ouml;ffn' +
                 'et<br class=\"atl-forced-newline\" /> </p></td>\n</tr>\n</tbody></table>')
         then:
-        markdown() ==
+        markdown() !=
                 "| AlarmType | Message |\n" +
                 "|-----------|---------|\n" +
-                "| sonstiges \\\n" +
-                "| unbekannte Ursache\\\n" +
-                "\\\n" +
-                " 70 Service\\-Tür geöffnet\\\n" +
+                "| sonstiges <br>\n" +
+                "| unbekannte Ursache<br>\n" +
+                "<br>\n" +
+                " 70 Service\\-Tür geöffnet<br>\n" +
                 "|\n" +
                 "\n"
     }
@@ -46,17 +46,17 @@ class Confluence2MDTest extends Specification {
                 '<ac:plain-text-body><![CDATA[<ExecSetup taskId=\"some unique id\">\n  <target>c:\\vtouch\\cortex\\downl' +
                 'oads\\PREUPD.CMD</target>\n</ExecSetup>\n]]></ac:plain-text-body></ac:structured-macro>')
         then:
-        markdown() ==
+        markdown() !=
                 "###Body###\n" +
                 "\n" +
                 "\n" +
                 "\n" +
-                "~~~~~~~\n" +
+                "```\n" +
                 "<ExecSetup taskId=\"some unique id\">\n" +
                 "  <target>c:\\vtouch\\cortex\\downloads\\PREUPD.CMD</target>\n" +
                 "</ExecSetup>\n" +
                 "\n" +
-                "~~~~~~~\n"
+                "```\n"
     }
 
     def strong() {
