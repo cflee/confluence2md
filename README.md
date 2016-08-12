@@ -1,3 +1,9 @@
+**NOTE: THIS IS A FORKED REPO ON A BRANCH, YOU SHOULD VISIT THE MAIN REPO FOR UPDATES**
+
+This branch contains some hacky mods to change how the markdown output is formatted. The tests are not updated appropriately, but instead are just hacked to let it compile. See commits for details. Beware!
+
+---
+
 # Confluence2MD #
 
 ## Idea ##
